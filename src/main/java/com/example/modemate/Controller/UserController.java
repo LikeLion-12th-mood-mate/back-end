@@ -1,6 +1,7 @@
 package com.example.modemate.Controller;
 
-import com.example.modemate.DTO.UserDTO;
+import com.example.modemate.DTO.UserLoginDTO;
+import com.example.modemate.DTO.UserRegisterDTO;
 import com.example.modemate.Service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,12 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping("/login")
-    @Operation(summary = "회원 로그인 기능", description = "로그인에 사용되는 API")
+    @Operation(summary = "회원 로그인 기능", description = "이메일(email), 패스워드로(password)를 이용하여 로그인 시도")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "401", description = "로그인 실패", content = @Content(mediaType = "application/json"))
@@ -33,7 +36,10 @@ public class UserController {
             @Parameter(name = "email", description = "아이디(이메일)", example = "test@naver.com"),
             @Parameter(name = "password", description = "비밀번호", example = "1234"),
     })
-    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userDTO) {
+
+        log.info("[User Controller] login");
+
         String status = userService.login(userDTO);
 
         if(status.equals("user not found") || status.equals("password error")) {
@@ -45,15 +51,19 @@ public class UserController {
 
 
     @PostMapping("/register")
-    @Operation(summary = "회원 가입 기능", description = "회원가입에 사용되는 API")
+    @Operation(summary = "회원 가입 기능", description = "이메일(email), 별칭(nickname), 비밀번포(password)를 이용하여 회원가입")
     @ApiResponse(responseCode = "200", description = "회원 가입 성공", content = @Content(mediaType = "application/json"))
     @Parameters({
             @Parameter(name = "email", description = "아이디(이메일)", example = "user2@naver.com"),
+            @Parameter(name = "nickname", description = "별칭", example = "수몽이"),
             @Parameter(name = "password", description = "비밀번호", example = "1234"),
     })
-    public String register(@RequestBody UserDTO dto) {
+    public String register(@RequestBody UserRegisterDTO dto) {
+        log.info("[User Controller] register");
+
         userService.register(dto);
-        return userService.login(new UserDTO(dto.getEmail(), dto.getPassword()));
+
+        return userService.login(new UserLoginDTO(dto.getEmail(), dto.getPassword()));
     }
 
 }

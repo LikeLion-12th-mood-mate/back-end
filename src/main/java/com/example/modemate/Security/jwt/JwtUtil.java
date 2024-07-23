@@ -47,7 +47,6 @@ public class JwtUtil {
         Claims claims = Jwts.claims();
         claims.put("userId", user.getUserId());
         claims.put("email", user.getEmail());
-        claims.put("nickname", user.getNickname());
 
         ZonedDateTime now = ZonedDateTime.now();
         ZonedDateTime tokenValidity = now.plusSeconds(expireTime);

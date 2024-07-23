@@ -18,6 +18,10 @@ public class User {
     private String password;
     private String nickname;
 
+    @ManyToOne
+    @JoinColumn(name = "program_id")
+    private Program program;
+
     public User(String email, String password, String nickname){
         this.email = email;
         this.password = password;
